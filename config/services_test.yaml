@@ -1,0 +1,16 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Fixture factories for tests (per module)
+    App\Tests\Fixtures\Modules\:
+        resource: '../tests/Fixtures/Modules/'
+        public: true
+
+    # Test support helpers
+    App\Tests\Support\:
+        resource: '../tests/Support/'
+        public: true
+        exclude:
+            - '../tests/Support/Fake*.php'

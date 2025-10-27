@@ -1,0 +1,78 @@
+framework:
+    messenger:
+        default_bus: messenger.bus.command
+        failure_transport: failed
+
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 3
+                    multiplier: 2
+            failed: 'doctrine://default?queue_name=failed'
+
+            # Event Bus - Async with RabbitMQ
+            event_bus:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: event_bus
+                        type: topic
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+
+            # Command Bus - Async with RabbitMQ
+            command_bus:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: command_bus
+                        type: direct
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+
+            # Query Bus - Always synchronous
+            query_bus: 'sync://'
+
+        routing:
+            # Route domain events to event bus (async)
+            'App\SharedKernel\Domain\DomainEvent': event_bus
+
+            # Route Integration Events to event bus (async)
+            'App\Modules\User\PublicApi\Event\UserWasCreatedIntegrationEvent': event_bus
+            'App\Modules\User\PublicApi\Event\UserWasApprovedIntegrationEvent': event_bus
+            'App\Modules\User\PublicApi\Event\UserEmailWasChangedIntegrationEvent': event_bus
+
+            # Future: Order Module Integration Events
+            # 'App\Modules\Order\PublicApi\Event\OrderWasPlacedIntegrationEvent': event_bus
+            # 'App\Modules\Order\PublicApi\Event\OrderWasConfirmedIntegrationEvent': event_bus
+
+            # Route commands to command bus
+            'App\SharedKernel\Application\Bus\CommandInterface': command_bus
+
+            # Route queries to query bus (sync)
+            'App\SharedKernel\Application\Bus\QueryInterface': query_bus
+
+        buses:
+            messenger.bus.default:
+                middleware:
+                    - validation
+
+            messenger.bus.command:
+                middleware:
+                    - validation
+                    - doctrine_transaction
+
+            messenger.bus.query:
+                middleware:
+                    - validation
+
+            messenger.bus.event:
+                default_middleware: allow_no_handlers
+                middleware:
+                    - validation

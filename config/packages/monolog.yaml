@@ -1,0 +1,94 @@
+monolog:
+    channels:
+        - deprecation # Deprecations are logged in the dedicated "deprecation" channel
+        - event_bus   # Domain events
+        - messenger   # Message handlers (commands, queries, events)
+        - domain      # Domain layer logs
+        - application # Application layer logs
+
+when@dev:
+    monolog:
+        handlers:
+            # Main handler - logs everything to console and file
+            main:
+                type: stream
+                path: "%kernel.logs_dir%/%kernel.environment%.log"
+                level: debug
+                channels: ["!event", "!messenger", "!event_bus"]
+
+            # Event Bus logs (domain events)
+            event_bus:
+                type: stream
+                path: "%kernel.logs_dir%/event_bus.log"
+                level: debug
+                channels: [event_bus]
+                formatter: monolog.formatter.json  # JSON for easy parsing
+
+            # Messenger logs (handlers)
+            messenger:
+                type: stream
+                path: "%kernel.logs_dir%/messenger.log"
+                level: debug
+                channels: [messenger]
+                formatter: monolog.formatter.json  # JSON for easy parsing
+
+            # Console output (colored, human-readable)
+            console:
+                type: console
+                process_psr_3_messages: false
+                channels: ["!event", "!doctrine"]
+                formatter: monolog.formatter.line  # Human-readable for dev
+
+when@prod:
+    monolog:
+        handlers:
+            # Main handler - sends to stdout in JSON (for Docker/Kubernetes)
+            main:
+                type: fingers_crossed
+                action_level: error
+                handler: nested
+                excluded_http_codes: [404, 405]
+                buffer_size: 50
+
+            nested:
+                type: stream
+                path: php://stdout
+                level: debug
+                formatter: monolog.formatter.json  # JSON for Datadog
+
+            # Event Bus logs
+            event_bus:
+                type: stream
+                path: php://stdout
+                level: info
+                channels: [event_bus]
+                formatter: monolog.formatter.json
+
+            # Messenger logs
+            messenger:
+                type: stream
+                path: php://stdout
+                level: info
+                channels: [messenger]
+                formatter: monolog.formatter.json
+
+            # Errors to separate stream for alerting
+            errors:
+                type: stream
+                path: php://stderr
+                level: error
+                formatter: monolog.formatter.json
+
+when@test:
+    monolog:
+        handlers:
+            main:
+                type: fingers_crossed
+                action_level: error
+                handler: nested
+                excluded_http_codes: [404, 405]
+                channels: ["!event"]
+            nested:
+                type: stream
+                path: "%kernel.logs_dir%/test.log"
+                level: debug

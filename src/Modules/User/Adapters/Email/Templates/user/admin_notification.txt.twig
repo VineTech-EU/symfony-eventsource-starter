@@ -1,0 +1,19 @@
+⚠️ {{ 'email.admin.header'|trans({}, 'emails')|upper }}
+===============================
+
+{{ 'email.admin.title'|trans({}, 'emails') }}
+
+{{ 'email.admin.intro'|trans({}, 'emails') }} [{{ 'email.admin.status_pending'|trans({}, 'emails')|upper }}]
+
+{{ 'email.admin.user_details_title'|trans({}, 'emails') }}:
+- {{ 'email.admin.user_name'|trans({}, 'emails') }} {{ newUserName }}
+- {{ 'email.admin.user_email'|trans({}, 'emails') }} {{ newUserEmail }}
+- {{ 'email.admin.user_status'|trans({}, 'emails') }} {{ 'email.admin.status_pending_value'|trans({}, 'emails') }}
+
+{{ 'email.admin.action_required'|trans({}, 'emails') }}
+
+{{ 'email.admin.tech_note'|trans({}, 'emails') }}
+
+---
+{{ 'email.footer.automated_admin'|trans({}, 'emails') }}
+{{ 'email.footer.no_reply'|trans({}, 'emails') }}

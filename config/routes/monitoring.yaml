@@ -1,0 +1,17 @@
+# Prometheus Metrics Endpoint
+metrics_prometheus:
+    path: /metrics/prometheus
+    controller: Artprima\PrometheusMetricsBundle\Controller\MetricsController::prometheus
+
+# Health Check Endpoints
+health_check:
+    path: /health
+    controller: Liip\MonitorBundle\Controller\HealthCheckController::indexAction
+    defaults:
+        _format: json
+
+health_check_run:
+    path: /health/run
+    controller: Liip\MonitorBundle\Controller\HealthCheckController::runAction
+    defaults:
+        _format: json

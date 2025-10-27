@@ -1,0 +1,29 @@
+liip_monitor:
+    # Enable REST API for health checks
+    enable_controller: false
+
+    # Default mailer for notifications (optional)
+    # default_mailer: 'default'
+
+    # Health checks configuration
+    checks:
+        groups:
+            default:
+                # Database connectivity
+                doctrine_dbal:
+                    connection: default
+
+                # Filesystem checks
+                writable_directory:
+                    - '%kernel.cache_dir%'
+                    - '%kernel.logs_dir%'
+
+                # Disk space check (warning at 20%, critical at 10%)
+                disk_usage:
+                    warning: 20
+                    critical: 10
+                    path: '%kernel.project_dir%'
+
+                # Security advisories check (composer packages)
+                security_advisory:
+                    lock_file: '%kernel.project_dir%/composer.lock'

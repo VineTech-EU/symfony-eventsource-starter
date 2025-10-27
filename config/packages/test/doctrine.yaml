@@ -1,0 +1,33 @@
+doctrine:
+    dbal:
+        # Use "pdo_sqlite" with memory database for even faster tests (optional)
+        # url: '%env(resolve:DATABASE_URL)%'
+
+        # Disable logging in tests for better performance
+        logging: false
+        profiling: false
+
+    orm:
+        # Cache configuration for test environment
+        metadata_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+
+        query_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+
+        result_cache_driver:
+            type: pool
+            pool: doctrine.result_cache_pool
+
+framework:
+    cache:
+        pools:
+            # Result cache pool for query results
+            doctrine.result_cache_pool:
+                adapter: cache.app
+
+            # System cache pool for metadata and query parsing
+            doctrine.system_cache_pool:
+                adapter: cache.system

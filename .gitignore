@@ -1,0 +1,48 @@
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+###> phpunit/phpunit ###
+/phpunit.xml
+.phpunit.result.cache
+###< phpunit/phpunit ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> Docker ###
+/docker-compose.override.yml
+###< Docker ###
+
+###> IDE ###
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+###< IDE ###
+
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+.phpunit.cache/
+###< symfony/phpunit-bridge ###
+
+###> MCP Servers ###
+.claude/mcp-servers/node_modules/
+###< MCP Servers ###
+
+###> Claude Code ###
+.claude/
+.claude/settings.local.json
+.mcp.json
+CLAUDE.md
+###< Claude Code ###

@@ -1,0 +1,22 @@
+framework:
+    cache:
+        # Unique name of your app: used to compute stable namespaces for cache keys.
+        prefix_seed: symfony_eventsource
+
+        # Use Redis as default cache adapter
+        app: cache.adapter.redis
+        default_redis_provider: '%env(REDIS_DSN)%'
+
+        # Custom cache pools for different use cases
+        pools:
+            # Rate limiting cache (short TTL)
+            cache.rate_limiter:
+                adapter: cache.adapter.redis
+                provider: '%env(REDIS_DSN)%/3'  # Database 3 for rate limiting
+                default_lifetime: 60  # 1 minute
+
+            # Distributed locks (medium TTL)
+            cache.locks:
+                adapter: cache.adapter.redis
+                provider: '%env(REDIS_DSN)%/4'  # Database 4 for locks
+                default_lifetime: 300  # 5 minutes

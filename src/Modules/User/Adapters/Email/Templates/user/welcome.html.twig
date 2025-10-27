@@ -1,0 +1,23 @@
+{% extends 'email/layout/base.html.twig' %}
+
+{% block header_color %}#4CAF50{% endblock %}
+{% block box_color %}#4CAF50{% endblock %}
+
+{% block header_title %}
+    {{ 'email.welcome.header'|trans({}, 'emails') }}
+{% endblock %}
+
+{% block content %}
+    <h2>{{ 'email.welcome.greeting'|trans({'%name%': name}, 'emails') }}</h2>
+
+    <p>{{ 'email.welcome.thank_you'|trans({}, 'emails') }}</p>
+
+    <p>{{ 'email.welcome.created_with_tech'|trans({}, 'emails') }}</p>
+
+    <p class="tech-note">
+        <em>{{ 'email.welcome.tech_note'|trans({}, 'emails') }}</em>
+    </p>
+
+    <p>{{ 'email.welcome.best_regards'|trans({}, 'emails') }}<br>
+    {{ 'email.welcome.team'|trans({}, 'emails') }}</p>
+{% endblock %}

@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'symfony-ddd-monitor'
+
+scrape_configs:
+  # Symfony application metrics
+  - job_name: 'symfony-app'
+    metrics_path: /metrics/prometheus
+    static_configs:
+      - targets: ['nginx:80']
+        labels:
+          service: 'symfony-app'
+          environment: 'dev'
+
+  # PostgreSQL metrics (if exporter is added later)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'postgres'
+          environment: 'dev'
+
+  # RabbitMQ metrics
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692']
+        labels:
+          service: 'rabbitmq'
+          environment: 'dev'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

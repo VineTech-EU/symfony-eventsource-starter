@@ -1,0 +1,37 @@
+artprima_prometheus_metrics:
+    # Namespace for all metrics (prefix)
+    namespace: symfony
+
+    # Storage type - Redis for persistence across PHP-FPM workers
+    type: redis
+    redis:
+        host: '%env(REDIS_HOST)%'
+        port: '%env(int:REDIS_PORT)%'
+        timeout: 0.1
+        read_timeout: 10
+        persistent_connections: true
+        password: ~
+        database: 1  # Use database 1 for metrics (0 for cache, 1 for metrics, 2 for sessions)
+
+    # Ignored routes (to avoid metric explosion)
+    ignored_routes:
+        - _wdt
+        - _profiler
+        - _profiler_search
+        - _profiler_search_bar
+        - _profiler_phpinfo
+        - _profiler_search_results
+        - _profiler_open_file
+        - _preview_error
+        - metrics_prometheus
+        - health_check
+        - health_check_run
+
+    # Disable default metrics (we use custom collectors)
+    disable_default_metrics: false
+
+    # Enable console metrics
+    enable_console_metrics: false
+
+    # Disable promphp default metrics (we'll create our own)
+    disable_default_promphp_metrics: false

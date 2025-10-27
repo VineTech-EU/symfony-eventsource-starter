@@ -1,0 +1,34 @@
+{% extends 'email/layout/base.html.twig' %}
+
+{% block header_color %}#FF9800{% endblock %}
+{% block box_color %}#FF9800{% endblock %}
+
+{% block header_title %}
+    ⚠️ {{ 'email.admin.header'|trans({}, 'emails') }}
+{% endblock %}
+
+{% block content %}
+    <h2>{{ 'email.admin.title'|trans({}, 'emails') }}</h2>
+
+    <p>{{ 'email.admin.intro'|trans({}, 'emails') }} <span class="status-badge badge-warning">{{ 'email.admin.status_pending'|trans({}, 'emails') }}</span></p>
+
+    <div class="info-box">
+        <h3>{{ 'email.admin.user_details_title'|trans({}, 'emails') }}</h3>
+        <ul>
+            <li><strong>{{ 'email.admin.user_name'|trans({}, 'emails') }}</strong> {{ newUserName }}</li>
+            <li><strong>{{ 'email.admin.user_email'|trans({}, 'emails') }}</strong> {{ newUserEmail }}</li>
+            <li><strong>{{ 'email.admin.user_status'|trans({}, 'emails') }}</strong> {{ 'email.admin.status_pending_value'|trans({}, 'emails') }}</li>
+        </ul>
+    </div>
+
+    <p>{{ 'email.admin.action_required'|trans({}, 'emails') }}</p>
+
+    <p class="tech-note">
+        <em>{{ 'email.admin.tech_note'|trans({}, 'emails') }}</em>
+    </p>
+{% endblock %}
+
+{% block footer %}
+    <p>{{ 'email.footer.automated_admin'|trans({}, 'emails') }}</p>
+    <p>{{ 'email.footer.no_reply'|trans({}, 'emails') }}</p>
+{% endblock %}

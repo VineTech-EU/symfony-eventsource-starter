@@ -1,0 +1,10 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    file_name_pattern: '*.twig'
+    paths:
+        # User module email templates
+        '%kernel.project_dir%/src/Modules/User/Adapters/Email/Templates': user_emails
+
+when@test:
+    twig:
+        strict_variables: true

@@ -1,0 +1,40 @@
+# Email translations (English)
+# Domain: emails
+
+# Common footer
+email.footer.automated: 'This is an automated message. Please do not reply to this email.'
+email.footer.automated_admin: 'This is an automated admin notification. Please do not reply to this email.'
+email.footer.no_reply: 'If you have any questions, please contact our support team.'
+
+# Welcome Email
+email.welcome.header: 'Welcome!'
+email.welcome.greeting: 'Hello %name%,'
+email.welcome.thank_you: 'Thank you for joining our platform! We''re excited to have you on board.'
+email.welcome.created_with_tech: 'Your account has been successfully created using Event Sourcing and Domain-Driven Design principles.'
+email.welcome.tech_note: 'This email was sent automatically when the UserCreated event was dispatched.'
+email.welcome.best_regards: 'Best regards,'
+email.welcome.team: 'The Team'
+
+# Admin Notification Email
+email.admin.header: 'New User Registration'
+email.admin.title: 'Admin Notification'
+email.admin.intro: 'A new user has registered and is'
+email.admin.status_pending: 'PENDING APPROVAL'
+email.admin.status_pending_value: 'Pending Approval'
+email.admin.user_details_title: 'User Details:'
+email.admin.user_name: 'Name:'
+email.admin.user_email: 'Email:'
+email.admin.user_status: 'Status:'
+email.admin.action_required: 'Please review this user''s information and approve or reject their registration.'
+email.admin.tech_note: 'This notification was sent automatically via Event-Driven Architecture when the UserCreated event was dispatched.'
+
+# Approval Confirmation Email
+email.approval.header: 'Account Approved!'
+email.approval.greeting: 'Hello %name%,'
+email.approval.good_news: 'Great news! Your account has been'
+email.approval.status_approved: 'APPROVED'
+email.approval.full_access: 'You now have full access to our platform and can start using all features.'
+email.approval.thank_you: 'Thank you for your patience during the approval process.'
+email.approval.tech_note: 'This notification was sent automatically when your account status changed from pending to approved.'
+email.approval.best_regards: 'Best regards,'
+email.approval.team: 'The Team'

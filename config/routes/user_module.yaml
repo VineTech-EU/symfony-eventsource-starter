@@ -1,0 +1,6 @@
+# User Module Routes
+# Routes are defined with their full paths in controller attributes
+
+user_module_controllers:
+    resource: '../../src/Modules/User/Adapters/Http/Controller/'
+    type: attribute

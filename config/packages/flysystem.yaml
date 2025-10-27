@@ -1,0 +1,30 @@
+# Read the documentation at https://github.com/thephpleague/flysystem-bundle/blob/master/docs/1-getting-started.md
+flysystem:
+    storages:
+        # Default local storage (for development/fallback)
+        default.storage:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/default'
+
+        # MinIO S3-compatible storage
+        minio.storage:
+            adapter: 'aws'
+            options:
+                client: 'minio.s3_client'
+                bucket: '%env(MINIO_BUCKET)%'
+                prefix: ''
+
+# MinIO S3 Client Configuration
+services:
+    minio.s3_client:
+        class: Aws\S3\S3Client
+        arguments:
+            -
+                version: 'latest'
+                region: '%env(MINIO_REGION)%'
+                endpoint: '%env(MINIO_ENDPOINT)%'
+                use_path_style_endpoint: true
+                credentials:
+                    key: '%env(MINIO_ACCESS_KEY)%'
+                    secret: '%env(MINIO_SECRET_KEY)%'

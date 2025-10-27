@@ -1,0 +1,18 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+
+    symfony:
+        # Use test container to include test services (fixture factories, etc.)
+        containerXmlPath: var/cache/test/App_KernelTestDebugContainer.xml
+
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
+
+    excludePaths:
+        - src/Kernel.php
+        - tests/bootstrap.php
+        - var/*
+        - vendor/*

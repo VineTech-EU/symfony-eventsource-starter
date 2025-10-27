@@ -1,0 +1,181 @@
+{# Base email layout - all emails inherit from this #}
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Base styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f4f4f4;
+        }
+
+        /* Container */
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .email-header {
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+            background-color: {% block header_color %}#4CAF50{% endblock %};
+        }
+
+        .email-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        /* Content */
+        .email-content {
+            padding: 30px 20px;
+            background-color: #f9f9f9;
+        }
+
+        .email-content h2 {
+            color: #333333;
+            font-size: 22px;
+            margin-top: 0;
+        }
+
+        .email-content p {
+            margin: 15px 0;
+            color: #555555;
+        }
+
+        .email-content code {
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .email-content strong {
+            color: #333333;
+        }
+
+        /* Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .badge-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #FFC107;
+            color: #000000;
+        }
+
+        .badge-info {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        /* Box */
+        .info-box {
+            background-color: white;
+            border-left: 4px solid {% block box_color %}#4CAF50{% endblock %};
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            margin-top: 0;
+            color: #333333;
+        }
+
+        .info-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            margin: 8px 0;
+        }
+
+        /* Footer */
+        .email-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #999999;
+            background-color: #f0f0f0;
+        }
+
+        .email-footer p {
+            margin: 5px 0;
+        }
+
+        /* Technical note */
+        .tech-note {
+            font-size: 12px;
+            color: #888888;
+            font-style: italic;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .email-header h1 {
+                font-size: 24px;
+            }
+
+            .email-content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        {# Header block #}
+        <div class="email-header">
+            {% block header %}
+                <h1>{% block header_title %}{% endblock %}</h1>
+            {% endblock %}
+        </div>
+
+        {# Main content block #}
+        <div class="email-content">
+            {% block content %}{% endblock %}
+        </div>
+
+        {# Footer block #}
+        <div class="email-footer">
+            {% block footer %}
+                <p>{{ 'email.footer.automated'|trans({}, 'emails') }}</p>
+                <p>{{ 'email.footer.no_reply'|trans({}, 'emails') }}</p>
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="tests/bootstrap.php"
+         cacheDirectory=".phpunit.cache"
+         beStrictAboutOutputDuringTests="false"
+         failOnRisky="false"
+         failOnWarning="false"
+         stopOnFailure="false"
+         displayDetailsOnTestsThatTriggerWarnings="false"
+         beStrictAboutChangesToGlobalState="false"
+>
+    <php>
+        <ini name="display_errors" value="1"/>
+        <ini name="error_reporting" value="-1"/>
+        <ini name="memory_limit" value="-1"/>
+        <server name="APP_ENV" value="test" force="true"/>
+        <server name="SHELL_VERBOSITY" value="-1"/>
+        <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
+        <server name="SYMFONY_PHPUNIT_VERSION" value="11.0"/>
+        <server name="KERNEL_CLASS" value="App\Kernel"/>
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <env name="APP_SECRET" value="f01e82e329fcbc46108be1b5a26efdd7"/>
+        <!-- ###- symfony/framework-bundle ### -->
+
+        <!-- ###+ symfony/routing ### -->
+        <env name="DEFAULT_URI" value="http://localhost"/>
+        <!-- ###- symfony/routing ### -->
+    </php>
+
+    <testsuites>
+        <!-- Unit tests: Fast, no infrastructure dependencies -->
+        <testsuite name="Unit">
+            <directory suffix="UnitTest.php">tests/Modules</directory>
+            <directory suffix="UnitTest.php">tests/SharedKernel</directory>
+        </testsuite>
+
+        <!-- Integration tests: Database, multiple components -->
+        <testsuite name="Integration">
+            <directory suffix="IntegrationTest.php">tests/Modules</directory>
+            <directory suffix="IntegrationTest.php">tests/SharedKernel</directory>
+        </testsuite>
+
+        <!-- Functional tests: Full HTTP stack -->
+        <testsuite name="Functional">
+            <directory suffix="FunctionalTest.php">tests/Modules</directory>
+            <directory suffix="FunctionalTest.php">tests/SharedKernel</directory>
+        </testsuite>
+    </testsuites>
+
+    <extensions>
+        <!-- DAMA Doctrine Test Bundle - Wraps each test in a transaction and rolls back after -->
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    </extensions>
+
+    <!-- Coverage configuration -->
+    <coverage includeUncoveredFiles="true"
+              pathCoverage="false"
+              ignoreDeprecatedCodeUnits="true"
+              disableCodeCoverageIgnore="false">
+        <report>
+            <html outputDirectory="var/coverage"/>
+            <text outputFile="php://stdout" showOnlySummary="true"/>
+            <clover outputFile="var/coverage/clover.xml"/>
+        </report>
+    </coverage>
+
+    <source>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <!-- ===== BOOTSTRAP & CONFIGURATION ===== -->
+            <!-- Kernel and bootstrap files (no business logic) -->
+            <file>src/Kernel.php</file>
+            <file>src/**/*Exception.php</file>
+
+            <!-- Dependency Injection (CompilerPass - infrastructure configuration) -->
+            <directory>src/SharedKernel/Adapters/DependencyInjection</directory>
+            <directory>src/Modules/*/Adapters/DependencyInjection</directory>
+
+            <!-- ===== DATA FIXTURES (Development/Test data only) ===== -->
+            <!-- Fixtures are not production code - used only for seeding test data -->
+            <directory>src/Modules/*/Adapters/DataFixtures</directory>
+
+            <!-- ===== DTOs & VALUE OBJECTS (Simple data carriers) ===== -->
+            <!-- Request DTOs (simple property bags) -->
+            <directory>src/Modules/*/Application/Command/DTO</directory>
+            <!-- Query DTOs (simple read models) -->
+            <directory>src/Modules/*/Application/Query/DTO</directory>
+            <!-- Projection Value Objects (enums for read models) -->
+            <directory>src/Modules/*/Adapters/Persistence/Projection/ValueObject</directory>
+            <!-- Integration Events (cross-module DTOs - simple data carriers) -->
+            <directory>src/Modules/*/PublicApi/Event</directory>
+
+            <!-- ===== DOCTRINE ENTITIES (ORM Mappings) ===== -->
+            <!-- Read Models (projections - tested via handlers) -->
+            <file>src/Modules/User/Adapters/Persistence/Projection/UserReadModel.php</file>
+            <!-- Event Store entity (infrastructure, tested via DoctrineEventStore) -->
+            <file>src/SharedKernel/Adapters/EventStore/EventStoreEntity.php</file>
+
+            <!-- ===== EVENT UPCASTERS (Migration code) ===== -->
+            <!-- Upcasters for event schema evolution - activated only during migrations -->
+            <directory>src/Modules/*/Adapters/EventStore/Upcaster</directory>
+
+            <!-- ===== CONTROLLERS (Thin HTTP layer) ===== -->
+            <!-- Controllers are tested via Functional tests -->
+            <directory>src/Modules/*/Adapters/Http/Controller</directory>
+            <directory>src/SharedKernel/Adapters/Http</directory>
+
+            <!-- ===== CONSOLE COMMANDS (Thin CLI layer) ===== -->
+            <!-- Console commands just delegate to use cases - tested via handlers -->
+            <directory>src/Modules/*/Adapters/Console</directory>
+            <directory>src/SharedKernel/Adapters/Console</directory>
+
+            <!-- ===== SCHEDULER CONFIGURATION ===== -->
+            <!-- Scheduler configuration classes - infrastructure wiring, no business logic -->
+            <directory>src/Modules/*/Adapters/Scheduler</directory>
+            <directory>src/SharedKernel/Adapters/Scheduler</directory>
+
+            <!-- ===== INFRASTRUCTURE WRAPPERS ===== -->
+            <!-- Simple wrappers around Symfony Messenger (tested via integration) -->
+            <directory>src/SharedKernel/Adapters/Bus</directory>
+
+            <!-- ===== COMMAND/QUERY HANDLERS (Thin Symfony Messenger wrappers) ===== -->
+            <!-- These just delegate to use cases - tested via functional tests -->
+            <directory>src/Modules/*/Application/Command</directory>
+            <directory>src/Modules/*/Application/Query</directory>
+
+            <!-- ===== EXCEPTIONS (Simple exception classes) ===== -->
+            <directory>src/Modules/*/Domain/Exception</directory>
+            <directory>src/SharedKernel/Domain/Exception</directory>
+            <directory>src/SharedKernel/Application/Exception</directory>
+            <file>src/SharedKernel/Domain/EventStore/EventStoreException.php</file>
+
+            <!-- ===== MONITORING (Metrics collection - low business value) ===== -->
+            <!-- Prometheus metrics collectors and Liip health checks (tested via functional tests) -->
+            <directory>src/SharedKernel/Adapters/Monitoring</directory>
+        </exclude>
+    </source>
+
+    <!-- Groups for selective test execution -->
+    <groups>
+        <exclude>
+            <group>slow</group>
+            <group>external</group>
+        </exclude>
+    </groups>
+</phpunit>

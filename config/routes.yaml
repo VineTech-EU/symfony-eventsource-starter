@@ -1,0 +1,6 @@
+# This file is the entry point to configure your own HTTP routes.
+# Files in the routes/ subdirectory configure your routes from 3rd-party bundles
+
+# Import module routes
+user_module:
+    resource: routes/user_module.yaml

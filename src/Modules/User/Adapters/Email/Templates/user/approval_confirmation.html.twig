@@ -1,0 +1,25 @@
+{% extends 'email/layout/base.html.twig' %}
+
+{% block header_color %}#4CAF50{% endblock %}
+{% block box_color %}#4CAF50{% endblock %}
+
+{% block header_title %}
+    ✅ {{ 'email.approval.header'|trans({}, 'emails') }}
+{% endblock %}
+
+{% block content %}
+    <h2>{{ 'email.approval.greeting'|trans({'%name%': name}, 'emails') }}</h2>
+
+    <p>{{ 'email.approval.good_news'|trans({}, 'emails') }} <span class="status-badge badge-success">{{ 'email.approval.status_approved'|trans({}, 'emails') }}</span></p>
+
+    <p>{{ 'email.approval.full_access'|trans({}, 'emails') }}</p>
+
+    <p>{{ 'email.approval.thank_you'|trans({}, 'emails') }}</p>
+
+    <p class="tech-note">
+        <em>{{ 'email.approval.tech_note'|trans({}, 'emails') }}</em>
+    </p>
+
+    <p>{{ 'email.approval.best_regards'|trans({}, 'emails') }}<br>
+    {{ 'email.approval.team'|trans({}, 'emails') }}</p>
+{% endblock %}

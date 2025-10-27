@@ -1,0 +1,19 @@
+framework:
+    messenger:
+        transports:
+            # Override all transports to be synchronous in tests
+            event_bus: 'sync://'
+            command_bus: 'sync://'
+            async: 'in-memory://'
+
+        # In test environment, allow no handlers for integration events
+        buses:
+            messenger.bus.default:
+                default_middleware: allow_no_handlers
+                middleware:
+                    - validation
+
+            messenger.bus.event:
+                default_middleware: allow_no_handlers
+                middleware:
+                    - validation

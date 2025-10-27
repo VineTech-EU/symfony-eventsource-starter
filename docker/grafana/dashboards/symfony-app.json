@@ -1,0 +1,145 @@
+{
+  "dashboard": {
+    "title": "Symfony DDD Event Sourcing - Application Dashboard",
+    "tags": ["symfony", "event-sourcing", "ddd"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "HTTP Request Rate",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(symfony_http_requests_total[5m])",
+            "legendFormat": "{{method}} {{route}}"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "HTTP Request Duration (95th percentile)",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(symfony_http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{method}} {{route}}"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Event Store - Events Published",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(symfony_event_store_events_total[5m])",
+            "legendFormat": "{{event_type}}"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Event Handlers - Success Rate",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(symfony_event_handler_success_total[5m])",
+            "legendFormat": "Success - {{handler}}"
+          },
+          {
+            "expr": "rate(symfony_event_handler_failure_total[5m])",
+            "legendFormat": "Failure - {{handler}}"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Command Execution Time",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(symfony_command_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{command}}"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Messenger Queue Size",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "symfony_messenger_queue_messages",
+            "legendFormat": "{{queue}}"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Database Connections",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "symfony_database_connections_active",
+            "legendFormat": "Active"
+          },
+          {
+            "expr": "symfony_database_connections_idle",
+            "legendFormat": "Idle"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Memory Usage",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "symfony_memory_usage_bytes",
+            "legendFormat": "Memory Usage"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Error Rate (4xx/5xx)",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 32, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(symfony_http_errors_total{status=~\"4..\"}[5m])",
+            "legendFormat": "4xx - {{route}}"
+          },
+          {
+            "expr": "rate(symfony_http_errors_total{status=~\"5..\"}[5m])",
+            "legendFormat": "5xx - {{route}}"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Projection Lag",
+        "type": "graph",
+        "gridPos": {"x": 12, "y": 32, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "symfony_projection_lag_seconds",
+            "legendFormat": "{{projection}}"
+          }
+        ]
+      }
+    ]
+  },
+  "overwrite": true
+}

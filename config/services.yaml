@@ -1,0 +1,188 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    # SharedKernel Services (technical infrastructure)
+    App\SharedKernel\:
+        resource: '../src/SharedKernel/'
+        exclude:
+            - '../src/SharedKernel/Domain/AggregateRoot.php'
+            - '../src/SharedKernel/Domain/DomainEvent.php'
+            - '../src/SharedKernel/Domain/Exception/'
+
+    # Module Services (all business modules)
+    App\Modules\:
+        resource: '../src/Modules/'
+        exclude:
+            - '../src/Modules/*/Domain/Entity/'
+            - '../src/Modules/*/Domain/ValueObject/'
+            - '../src/Modules/*/Domain/Event/'
+            - '../src/Modules/*/README.md'
+
+    # Notification Module - Email Outbox Repository Interface Binding
+    App\Modules\Notification\Domain\Repository\EmailOutboxRepositoryInterface:
+        alias: App\Modules\Notification\Adapters\Persistence\Doctrine\EmailOutboxRepository
+
+    # Shared Kernel Adapters (cross-cutting infrastructure)
+    App\SharedKernel\Adapters\:
+        resource: '../src/SharedKernel/Adapters/'
+        exclude:
+            - '../src/SharedKernel/Adapters/EventStore/EventStoreEntity.php'
+
+    # User Module Controllers (must be public)
+    App\Modules\User\Adapters\Http\Controller\:
+        resource: '../src/Modules/User/Adapters/Http/Controller/'
+        tags: ['controller.service_arguments']
+        public: true
+
+    # ===== REDIS SESSION HANDLER =====
+
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments:
+            - '@Redis'
+            - { prefix: 'sess:', ttl: 3600 }
+
+    Redis:
+        class: Redis
+        calls:
+            - connect:
+                - '%env(REDIS_HOST)%'
+                - '%env(int:REDIS_PORT)%'
+            - select:
+                - 2  # Database 2 for sessions
+
+    # ===== MONITORING & METRICS =====
+
+    # Prometheus Metrics Collectors
+    App\SharedKernel\Adapters\Monitoring\EventStoreMetricsCollector:
+        tags:
+            - { name: artprima_prometheus.metrics_collector }
+
+    App\SharedKernel\Adapters\Monitoring\MessengerMetricsCollector:
+        tags:
+            - { name: artprima_prometheus.metrics_collector }
+
+    # Liip Monitor Health Checks
+    App\SharedKernel\Adapters\Monitoring\EventStoreHealthCheck:
+        tags:
+            - { name: liip_monitor.check, alias: event_store }
+
+    App\SharedKernel\Adapters\Monitoring\RabbitMQHealthCheck:
+        arguments:
+            $managementUrl: '%env(RABBITMQ_MANAGEMENT_URL)%'
+            $username: '%env(RABBITMQ_USER)%'
+            $password: '%env(RABBITMQ_PASSWORD)%'
+        tags:
+            - { name: liip_monitor.check, alias: rabbitmq }
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+
+    # Command Bus
+    App\SharedKernel\Application\Bus\CommandBusInterface:
+        class: App\SharedKernel\Adapters\Bus\SymfonyCommandBus
+        arguments:
+            - '@messenger.bus.command'
+
+    # Query Bus
+    App\SharedKernel\Application\Bus\QueryBusInterface:
+        class: App\SharedKernel\Adapters\Bus\SymfonyQueryBus
+        arguments:
+            - '@messenger.bus.query'
+
+    # Event Bus (with logging decorator)
+    App\SharedKernel\Adapters\Bus\SymfonyEventBus:
+        arguments:
+            - '@messenger.bus.event'
+
+    App\SharedKernel\Application\Bus\EventBusInterface:
+        class: App\SharedKernel\Adapters\Logging\LoggingEventBus
+        arguments:
+            $decorated: '@App\SharedKernel\Adapters\Bus\SymfonyEventBus'
+            $logger: '@monolog.logger.event_bus'
+
+    # Event Store
+    App\SharedKernel\Domain\EventStore\EventStoreInterface:
+        class: App\SharedKernel\Adapters\EventStore\DoctrineEventStore
+
+    # Event Type Registry (populated by CompilerPass)
+    App\SharedKernel\Adapters\EventStore\EventTypeRegistry: ~
+
+    # Event Upcaster Chain (for event versioning)
+    App\SharedKernel\Adapters\EventStore\EventUpcasterChain:
+        arguments:
+            $upcasters: !tagged_iterator app.event_upcaster
+
+    # Event Serializer (with upcasting support and registry)
+    App\SharedKernel\Adapters\EventStore\EventSerializer:
+        arguments:
+            $denormalizer: '@serializer'
+            $upcasterChain: '@App\SharedKernel\Adapters\EventStore\EventUpcasterChain'
+            $eventTypeRegistry: '@App\SharedKernel\Adapters\EventStore\EventTypeRegistry'
+
+    # Event Upcasters - Module-specific (for event schema evolution)
+    # Each module manages its own event upcasters
+    # To activate an upcaster, uncomment and tag with 'app.event_upcaster'
+
+    # User Module Upcasters
+    # App\Modules\User\Adapters\EventStore\Upcaster\UserCreatedV1ToV2Upcaster:
+    #     tags: ['app.event_upcaster']
+
+    # Future: Other modules
+    # App\Modules\Order\Adapters\EventStore\Upcaster\OrderPlacedV1ToV2Upcaster:
+    #     tags: ['app.event_upcaster']
+
+    # Repositories (Write Side - Event Sourcing)
+    App\Modules\User\Domain\Repository\UserRepositoryInterface:
+        class: App\Modules\User\Adapters\Persistence\Repository\DoctrineUserRepository
+
+    # Finders (Read Side - Projections)
+    App\Modules\User\Application\Query\UserFinderInterface:
+        class: App\Modules\User\Adapters\Persistence\Projection\UserFinder
+
+    # Read Model Repository (Projections)
+    App\Modules\User\Application\Query\UserReadModelRepositoryInterface:
+        class: App\Modules\User\Adapters\Persistence\Projection\UserReadModelRepository
+
+    # Email Services (User Module)
+    App\Modules\User\Application\Service\SendWelcomeEmailInterface:
+        class: App\Modules\User\Adapters\Email\Service\SendWelcomeEmail
+
+    App\Modules\User\Application\Service\SendApprovalConfirmationEmailInterface:
+        class: App\Modules\User\Adapters\Email\Service\SendApprovalConfirmationEmail
+
+    App\Modules\User\Application\Service\SendAdminNotificationInterface:
+        class: App\Modules\User\Adapters\Email\Service\SendAdminNotification
+
+    # Email Infrastructure (Notification Module)
+    App\Modules\Notification\Application\Service\EmailSenderInterface:
+        class: App\Modules\Notification\Adapters\Service\EmailSender
+
+    App\Modules\Notification\Adapters\Service\EmailSender:
+        arguments:
+            $fromEmail: '%env(MAIL_FROM_ADDRESS)%'
+            $fromName: '%env(MAIL_FROM_NAME)%'
+
+    # Logging Infrastructure
+    App\SharedKernel\Adapters\Logging\DomainContextProcessor:
+        arguments:
+            $appName: 'symfony-eventsource'
+            $environment: '%kernel.environment%'
+        tags:
+            - { name: monolog.processor }
+
+    App\SharedKernel\Adapters\Logging\LoggingMiddleware:
+        arguments:
+            $logger: '@monolog.logger.messenger'
+        tags:
+            - { name: messenger.middleware }
+
